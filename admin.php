@@ -39,6 +39,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         header("Location: /");
     }
 }
+// Проверяем, была ли отправлена форма для удаления поста
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'delete') {
+    $titleToDelete = htmlspecialchars($_POST['titleToDelete']);
+
+    // Загружаем существующие посты
+    $posts = file_get_contents('posts.html');
+
+    // Разбиваем посты на массив
+    $postsArray = explode("<hr>", $posts);
+    $newPostsArray = [];
+
+    // Удаляем пост с указанным заголовком
+    foreach ($postsArray as $post) {
+        if (strpos($post, "<h2>$titleToDelete</h2>") === false) {
+            $newPostsArray[] = $post;
+        }
+    }
+
+    // Сохраняем обновленный список постов
+    file_put_contents('posts.html', implode("<hr>", $newPostsArray));
+    header("Location: /");
+}
+
+// Загружаем существующие посты
+$posts = file_get_contents('posts.html');
 ?>
 
 
@@ -73,4 +98,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     </div>
 </body>
 </html>
-
