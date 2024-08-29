@@ -6,16 +6,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
     // Обработка загрузки изображения (необязательная)
     $uploadDir = 'uploads/'; // Директория для загрузки изображений
-    $uploadFile = $uploadDir . basename($_FILES['image']['name']);
-    $imageFileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
+    $imageFileType = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
     $uploadOk = 1;
 
     // Проверка на существование файла, если файл загружен
     if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
-        if (file_exists($uploadFile)) {
-            echo "Извините, файл уже существует.";
-            $uploadOk = 0;
-        }
+        // Генерируем случайное имя файла
+        $randomFileName = uniqid() . '.' . $imageFileType;
+        $uploadFile = $uploadDir . $randomFileName;
 
         // Проверка типа файла
         if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
@@ -27,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         if ($uploadOk == 1) {
             if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadFile)) {
                 // Сохраняем пост в файл с изображением
-                $post = "<h2>$title</h2><p>$content</p><img src='$uploadFile' alt='$title' style='max-width: 100%;'><hr>";
+                $post = "<h2>$title</h2><img src='$uploadFile' alt='$title' style='max-width: 100%;'><p>$content</p><hr>";
                 file_put_contents('posts.html', $post, FILE_APPEND);
                 header("Location: /");
             } else {
@@ -41,33 +39,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         header("Location: /");
     }
 }
-
-// Проверяем, была ли отправлена форма для удаления поста
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'delete') {
-    $titleToDelete = htmlspecialchars($_POST['titleToDelete']);
-
-    // Загружаем существующие посты
-    $posts = file_get_contents('posts.html');
-
-    // Разбиваем посты на массив
-    $postsArray = explode("<hr>", $posts);
-    $newPostsArray = [];
-
-    // Удаляем пост с указанным заголовком
-    foreach ($postsArray as $post) {
-        if (strpos($post, "<h2>$titleToDelete</h2>") === false) {
-            $newPostsArray[] = $post;
-        }
-    }
-
-    // Сохраняем обновленный список постов
-    file_put_contents('posts.html', implode("<hr>", $newPostsArray));
-    header("Location: /");
-}
-
-// Загружаем существующие посты
-$posts = file_get_contents('posts.html');
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ru">
