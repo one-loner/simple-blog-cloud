@@ -46,12 +46,21 @@ form {
     flex-direction: column;
 }
 
-input[type="text"], textarea {
+input[type="text"] {
     margin-bottom: 10px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
+textarea {
+    margin-bottom: 1px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 200px;
+}
+
 
 button {
     padding: 10px;
